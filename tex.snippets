@@ -1,0 +1,115 @@
+priority 1000
+context "math()"
+snippet '([pbBvV]?)mat(?:(\d+)x(\d+))?([clrS|]*)' "matrix (p/b/B/V/v/array)" r
+`!p
+type_char = match.group(1) or ''
+cols_par = match.group(2)
+rows_par = match.group(3)
+align_str = match.group(4) or ''
+
+num_cols = int(cols_par) if cols_par else 2
+num_rows = int(rows_par) if rows_par else 2
+
+if num_cols < 1: num_cols = 1
+if num_rows < 1: num_rows = 1
+
+def distribute_align(chars, n):
+	if n == 0:
+		return []
+	if not chars:
+		return ['c'] * n
+	k = len(chars)
+	if k == 1:
+		return [chars[0]] * n
+	if n <= k:
+		res = [chars[0]]
+		mid_needed = n - 2
+		mid_avail = chars[1:-1]
+		if mid_needed > 0:
+			for i in range(mid_needed):
+				idx = i * len(mid_avail) // mid_needed if mid_avail else 0
+				res.append(mid_avail[min(idx, len(mid_avail)-1)] if mid_avail else 'c')
+		if n > 1:
+			res.append(chars[-1])
+		return res
+	else:
+		res = [chars[0]]
+		mid_needed = n - 2
+		mid_avail = chars[1:-1]
+		if mid_needed > 0:
+			for i in range(mid_needed):
+				idx = i * len(mid_avail) // mid_needed if mid_avail else 0
+				res.append(mid_avail[min(idx, len(mid_avail)-1)] if mid_avail else 'c')
+		if n > 1:
+			res.append(chars[-1])
+		return res
+
+if align_str:
+	delim_map = {
+		'p': ('\\left(', '\\right)'),
+		'b': ('\\left[', '\\right]'),
+		'B': ('\\left\\{', '\\right\\}'),
+		'v': ('\\left|', '\\right|'),
+		'V': ('\\left\\|', '\\right\\|'),
+	}
+	left, right = delim_map.get(type_char, ('', ''))
+
+	chars = []
+	bar_pos = []
+	for c in align_str:
+		if c == '|':
+			bar_pos.append(len(chars))
+		else:
+			chars.append(c)
+
+	C = len(chars)
+
+	if C == 0:
+		col_spec = 'c' * num_cols
+		if '|' in align_str:
+			parts = align_str.split('|')
+			if num_cols == 1 and len(parts) == 3 and not any(parts):
+				col_spec = '|'
+			else:
+				col_spec = 'c' * num_cols
+	else:
+		dist = distribute_align(chars, num_cols)
+		new_bar_pos = []
+		for p in bar_pos:
+			new_p = int(p * num_cols / C + 0.5)
+			if new_p > num_cols:
+				new_p = num_cols
+			new_bar_pos.append(new_p)
+		for p in sorted(new_bar_pos, reverse=True):
+			dist.insert(p, '|')
+		col_spec = ''.join(dist)
+
+	snip.rv = left + "\\begin{array}{" + col_spec + "}\n"
+	for r in range(num_rows):
+		snip.rv += '\t'
+		cells = [chr(ord('A') + (r * num_cols + c) % 26) for c in range(num_cols)]
+		snip.rv += " & ".join(cells)
+		if r < num_rows - 1:
+			snip.rv += " \\\\"
+		snip.rv += "\n"
+	snip.rv += "\t\\end{array}" + right
+else:
+	env_map = {
+		'p': 'pmatrix',
+		'b': 'bmatrix',
+		'B': 'Bmatrix',
+		'v': 'vmatrix',
+		'V': 'Vmatrix',
+	}
+	env = env_map.get(type_char, 'array')
+	snip.rv = "\\begin{" + env + "}\n"
+	for r in range(num_rows):
+		snip.rv += '\t'
+		cells = [chr(ord('A') + (r * num_cols + c) % 26) for c in range(num_cols)]
+		snip.rv += " & ".join(cells)
+		if r < num_rows - 1:
+			snip.rv += " \\\\"
+		snip.rv += "\n"
+	snip.rv += "\t\\end{" + env + "}"
+`
+endsnippet
