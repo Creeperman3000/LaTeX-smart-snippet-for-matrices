@@ -93,3 +93,5 @@ def env(name):
 	return x != '0' and y != '0'
 endglobal
 ```
+
+The original idea is from [@evesdropper](https://github.com/evesdropper/luasnip-latex-snippets.nvim).
