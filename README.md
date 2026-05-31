@@ -37,9 +37,8 @@ Append `{cols}x{rows}` **before** pressing Tab:
 ```latex
 pmat3x2+<Tab> →
 \begin{array}
-A & B \\
-C & D \\
-E & F
+A & B & C \\
+D & E & F
 \end{array}
 ```
 
