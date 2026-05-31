@@ -52,7 +52,7 @@ D & E & F
 - Alignment chars `c`, `l`, `r`, `S` (from [siunitx](https://ctan.org/pkg/siunitx)) can be appended afterward.
 - `|` can also be placed between alignment characters for a vertical bar.
 
-Environments from [asmmath](https://ctan.org/pkg/amsmath) (`pmatrix`, `bmatrix`, …) do not support alignment characters.
+Environments from [amsmath](https://ctan.org/pkg/amsmath) (`pmatrix`, `bmatrix`, …) do not support alignment characters.
 This means that when alignment **is** given, `array` + `\left`/`\right` is used instead.
 
 **Alignment chars logic:**
@@ -79,7 +79,7 @@ This means that when alignment **is** given, `array` + `\left`/`\right` is used 
 
 ---
 
-I would recomend adding this as your preamble. Full credit to u [@gillescastel](https://github.com/gillescastel/latex-snippets), licensed under the MIT License.
+I would recomend adding this as your preamble. Full credit to [@gillescastel](https://github.com/gillescastel/latex-snippets), licensed under the MIT License.
 
 ```python
 global !p
